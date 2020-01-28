@@ -25,8 +25,19 @@ class BaseList extends Component {
         searchRun: false
     }
 
+    choosePropToFilter = () => {
+        let categoryFromProps = this.props.category
+        let eq3 = categoryFromProps === CATEGORY_FILMS
+        let eq2 = categoryFromProps == CATEGORY_FILMS
+        let ret = eq3? 'title' : 'name'
+        console.log('from base list category props ' + categoryFromProps + ' ' + eq3 + ' ' + eq2 + ' ' + ret)
+        return ret
+    }
+
     fetchData = () => {
-        this.props.fetchData(this.props.category, this.page, this.choosePropToFilter())
+        let choosenFilter = this.choosePropToFilter()
+        console.log('choosen filter ' + choosenFilter)
+        this.props.fetchData(this.props.category, this.page, choosenFilter)
     }
 
     componentDidMount() {
@@ -81,14 +92,12 @@ class BaseList extends Component {
         )
     }
 
-    choosePropToFilter = () => {
-        return this.props.category === CATEGORY_FILMS? 'title' : 'name'
-    }
+    
 
     onQueryChanged = (search) => {
         console.log('base '+search.search)
         
-        this.props.filterData(search.search, this.choosePropToFilter)
+        this.props.filterData(search.search, this.choosePropToFilter())
         
         //this.setState({searchRun: false})
     }
@@ -98,9 +107,9 @@ class BaseList extends Component {
         console.log('humans count = ', humans.length)
         return (
             <View style={styles.root}>
-                <Search onSearchQueryChanged = {this.onQueryChanged}/>
+                <Search onSearchQueryChanged = {this.onQueryChanged} category={this.props.category}/>
                 <FlatList
-                    bounces={false}
+                    bounces={true}
                     style = {styles.container}
                     data = {humans}
                     renderItem={this.renderItem}
@@ -133,6 +142,7 @@ const mapStateToProps = (state) => {
     let filterQuery = state.human.filterQuery
     console.log('filter query '  + filterQuery)
     let filterProp = state.human.filterProperty
+    console.log('filter Prop '  + filterProp)
     let humansWithKey = state.human.humans
                             .filter(obj=>obj[filterProp].includes(filterQuery))
                             .map(human => ({...human, key: human.url}))
@@ -149,7 +159,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return{
-        fetchData: (category, page) => dispatch(fetchData(category, page)),
+        fetchData: (category, page, prop) => dispatch(fetchData(category, page, prop)),
         clearDataItems: () => dispatch(clearDataItems()),
         filterData: (query, prop) => dispatch(filterData(query, prop))
     }

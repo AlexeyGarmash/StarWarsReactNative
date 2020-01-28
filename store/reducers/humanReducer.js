@@ -17,7 +17,8 @@ const humanReducer = (state=initState, action) => {
             console.log('load start')
             return {
                 ...state,
-                loading: true
+                loading: true,
+                 filterProperty: action.propFilter
             }
         case DATA_LOAD_SUCCESS:
             console.log('load success')
@@ -27,7 +28,8 @@ const humanReducer = (state=initState, action) => {
                 loading: false,
                 loadedPage: state.loadedPage + 1,
                 humans: [...state.humans, ...action.data.results],
-                hasNext: action.data.next != null
+                hasNext: action.data.next != null,
+                filterProperty: action.propFilter
             }
         case DATA_LOAD_ERROR:
             console.log('load error')

@@ -6,12 +6,13 @@ import {
     DATA_FILTER} from '../constants'
 import axios from 'axios'
 
-export const fetchData = (categoty, page) => {
+export const fetchData = (categoty, page, propFilter) => {
+    console.log('from fetch ' + propFilter)
     return (dispatch, getState) => {
-        dispatch({type: DATA_LOAD_START})
+        dispatch({type: DATA_LOAD_START, propFilter})
         axios.get(`https://swapi.co/api/${categoty}/?page=${page}`)
         .then(({data}) => {
-            dispatch({type: DATA_LOAD_SUCCESS, data: data})
+            dispatch({type: DATA_LOAD_SUCCESS, data: data, propFilter})
         })
         .catch((error) => {
             dispatch({type: DATA_LOAD_ERROR, error: error.message})
