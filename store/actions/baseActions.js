@@ -1,4 +1,9 @@
-import {DATA_LOAD_ERROR, DATA_LOAD_START, DATA_LOAD_SUCCESS, DATA_CLEAR} from '../constants'
+import {
+    DATA_LOAD_ERROR, 
+    DATA_LOAD_START, 
+    DATA_LOAD_SUCCESS, 
+    DATA_CLEAR, 
+    DATA_FILTER} from '../constants'
 import axios from 'axios'
 
 export const fetchData = (categoty, page) => {
@@ -18,5 +23,11 @@ export const fetchData = (categoty, page) => {
 export const clearDataItems = () => {
     return (dispatch, getState) => {
         dispatch({type: DATA_CLEAR})
+    }
+}
+
+export const filterData = (query, prop) => {
+    return (dispatch, getState) => {
+        dispatch({type: DATA_FILTER, query, prop})
     }
 }

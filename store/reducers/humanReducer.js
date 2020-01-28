@@ -1,11 +1,13 @@
-import {DATA_LOAD_ERROR, DATA_LOAD_START, DATA_LOAD_SUCCESS, DATA_CLEAR} from '../constants'
+import {DATA_LOAD_ERROR, DATA_LOAD_START, DATA_LOAD_SUCCESS, DATA_CLEAR, DATA_FILTER} from '../constants'
 
 const initState = {
     humans: [],
     loading: false,
     error: null,
     loadedPage: 1,
-    hasNext: true
+    hasNext: true,
+    filterQuery: '',
+    filterProperty: ''
 }
 
 
@@ -21,7 +23,7 @@ const humanReducer = (state=initState, action) => {
             console.log('load success')
             console.log('has next --reducer-- ' + action.data.next)
             return {
-                
+                ...state,
                 loading: false,
                 loadedPage: state.loadedPage + 1,
                 humans: [...state.humans, ...action.data.results],
@@ -37,6 +39,14 @@ const humanReducer = (state=initState, action) => {
         case DATA_CLEAR:
             console.log('data clear')
             return initState
+        
+        case DATA_FILTER:
+            console.log('data filtered')
+            return {
+                ...state,
+                filterQuery: action.query,
+                filterProperty: action.prop
+            }
         default:
             console.log('sdfsdfdsfsdfdsf')
             return state

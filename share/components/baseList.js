@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import {View, FlatList, Text, StyleSheet, ActivityIndicator} from 'react-native'
 import {connect} from 'react-redux'
-import {fetchData} from '../../store/actions/baseActions'
+import {fetchData, filterData} from '../../store/actions/baseActions'
 import {clearDataItems} from '../../store/actions/baseActions'
-
+import {Search} from './search'
 import {renderItemPeople, renderItemVehicle, renderItemFilm} from './listItems/itemPeople'
 import {
     CATEGORY_FILMS, 
@@ -21,12 +21,17 @@ class BaseList extends Component {
         humans: [],
         pageLoaded: 0,
         loadMore: true,
-        onScrolled: false
+        onScrolled: false,
+        searchRun: false
+    }
+
+    fetchData = () => {
+        this.props.fetchData(this.props.category, this.page, this.choosePropToFilter())
     }
 
     componentDidMount() {
         console.log('cdm')
-        this.props.fetchData(this.props.category, this.page)
+        this.fetchData()
     }
     
 
@@ -64,7 +69,7 @@ class BaseList extends Component {
             console.log(this.props.hasNext)
             if(this.props.hasNext){
                 console.log('end reached ' + this.page)
-                this.props.fetchData(this.props.category, this.page)
+                this.fetchData()
             }
             
         //}
@@ -76,11 +81,24 @@ class BaseList extends Component {
         )
     }
 
+    choosePropToFilter = () => {
+        return this.props.category === CATEGORY_FILMS? 'title' : 'name'
+    }
+
+    onQueryChanged = (search) => {
+        console.log('base '+search.search)
+        
+        this.props.filterData(search.search, this.choosePropToFilter)
+        
+        //this.setState({searchRun: false})
+    }
+
     render() {
         const {humans, isLoading} = this.props
-        
+        console.log('humans count = ', humans.length)
         return (
             <View style={styles.root}>
+                <Search onSearchQueryChanged = {this.onQueryChanged}/>
                 <FlatList
                     bounces={false}
                     style = {styles.container}
@@ -112,7 +130,14 @@ const styles = StyleSheet.create({
 
 
 const mapStateToProps = (state) => {
-    let humansWithKey = state.human.humans.map(human => ({...human, key: human.url}))
+    let filterQuery = state.human.filterQuery
+    console.log('filter query '  + filterQuery)
+    let filterProp = state.human.filterProperty
+    let humansWithKey = state.human.humans
+                            .filter(obj=>obj[filterProp].includes(filterQuery))
+                            .map(human => ({...human, key: human.url}))
+                            
+                        
     return {
         humans: humansWithKey,
         isLoading: state.human.loading,
@@ -125,7 +150,8 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
     return{
         fetchData: (category, page) => dispatch(fetchData(category, page)),
-        clearDataItems: () => dispatch(clearDataItems())
+        clearDataItems: () => dispatch(clearDataItems()),
+        filterData: (query, prop) => dispatch(filterData(query, prop))
     }
 }
 
